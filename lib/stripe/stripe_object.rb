@@ -130,8 +130,12 @@ module Stripe
         update = new_value
         new_keys = update.keys.map(&:to_sym)
         # remove keys at the server, but not known locally
-        keys_to_unset = @original_values[key].keys - new_keys
-        keys_to_unset.each {|key| update[key] = ''}
+        begin
+          keys_to_unset = @original_values[key].keys - new_keys
+          keys_to_unset.each {|key| update[key] = ''}
+        rescue
+          puts "stripe pooped, probably from me trying to set the bank_account parameter on accounts"
+        end
 
         update
       else
